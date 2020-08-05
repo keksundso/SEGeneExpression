@@ -110,12 +110,24 @@ baysCall_t <- function(mergedDF){
 
 PPCPlot <- function(modleBRMS, brmsInput,PlotTile){
   yrep<- posterior_predict(modleBRMS, draws = 500)
-  p <- ppc_dens_overlay(brmsInput$b[!(is.na(brmsInput$b))], yrep[1:100, ])
-  p <- p + ggtitle(PlotTile) +xlab("beta value") +xlim(-4,4) +theme_linedraw()
+  p <- ppc_dens_overlay(brmsInput$b[brmsInput$enh == 0], yrep[1:100, brmsInput$enh == 0])
+  preal <- ppc_dens_overlay(brmsInput$b[brmsInput$enh == 1], yrep[1:100, brmsInput$enh == 1])
   
-  return(p)
+    p <- p + ggtitle(PlotTile) +xlab("") +xlim(-4,4) +ylim(0,0.8) +theme_linedraw()+theme(legend.position = "none",axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
+      annotate("text",  x=Inf, y = Inf, label = "no SE", vjust=2, hjust=2)
+    
+  preal <- preal + ggtitle("") +xlab("beta value") +xlim(-4,4) +ylim(0,0.8) +
+    theme_linedraw()+
+    theme(legend.position = "none",plot.title=element_blank())+
+    annotate("text",  x=Inf, y = Inf, label = "SE", vjust=2, hjust=2)
   
+
+  
+  return(plot_grid(p,preal, nrow = 2))
 }
+
 
 
 ```
